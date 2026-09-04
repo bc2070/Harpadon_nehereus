@@ -1,124 +1,106 @@
-## PAPER TITLE: Genomic mechanisms underlying Bombay Duck's rapid population surge
+## \# Genomic mechanisms underlying Bombay Duck's rapid population surge
 
 ## 
 
-## ABSTRACT: Bombay duck (*Harpadon nehereus*), once a minor by-catch in the East China Sea, has bloomed into a dominant species, altering marine ecosystems. This study explored the genomic basis of its mysterious recent success via chromosome-level genome assembly, comparative and population genomics. The genome assemblies of *H. nehereus* and its closely related outgroup species *Saurida undosquamis* were of good quality, showing a 96.7%\~96.8% BUSCO completeness. Population resequencing supports a single panmictic population throughout the coast of China. Expanded gene families, genes under intensified and positive selection are related to osmoregulation, hypoxia tolerance, immune function and reproduction. Recent selective sweeps are mostly related to immune response. These molecular signatures are consistent with long-term adaptations to a hypoxic, polluted and fluctuating environment. These findings suggest that species genomically preadapted to environments affected by global change can suddenly become new native invaders.
+## \## ABSTRACT
+
+## Bombay duck (Harpadon nehereus), once a minor by-catch in the East China Sea, has bloomed into a dominant species, altering marine ecosystems. This study explored the genomic basis of its mysterious recent success via chromosome-level genome assembly, comparative and population genomics. The genome assemblies of H. nehereus and its closely related outgroup species Saurida undosquamis were of good quality, showing a 96.7%\~96.8% BUSCO completeness. Population resequencing supports a single panmictic population throughout the coast of China. Expanded gene families, genes under intensified and positive selection are related to osmoregulation, hypoxia tolerance, immune function and reproduction. Recent selective sweeps are mostly related to immune response. These molecular signatures are consistent with long-term adaptations to a hypoxic, polluted and fluctuating environment. These findings suggest that species genomically preadapted to environments affected by global change can suddenly become new native invaders.
 
 ## 
 
-## PUBLICATION INFORMATION: Proceedings of the Royal Society B
+## \## PUBLICATION INFORMATION
+
+## Proceedings of the Royal Society B
 
 ## 
 
-## GENERAL INFORMATION
+## \## GENERAL INFORMATION
 
 ## 
 
-## 1\. Title of Datasets: Bombay\_Duck\_Genomic\_Data
+## \*\*1. Title of Datasets:\*\* Bombay\_Duck\_Genomic\_Data
 
 ## 
 
-## 2\. Author Information:
+## \*\*2. Author Information:\*\*
 
-## &#x20;  A. First Author:
+## \*   \*\*First Author:\*\* Bin Kang (Key Laboratory of Mariculture \& Fisheries College, Ocean University of China) | Email: binkang@163.com
 
-## &#x20;     Name: Bin Kang
-
-## &#x20;     Institution: Key Laboratory of Mariculture (Ministry of Education) \& Fisheries College, Ocean University of China
-
-## &#x20;     Email: binkang@163.com
+## \*   \*\*Corresponding Author:\*\* Rongfeng Cui (School of Ecology \& State Key Laboratory of Biocontrol, Sun Yat-Sen University; Southern Marine Science and Engineering Guangdong Laboratory (Zhuhai)) | Email: cuirf@mail.sysu.edu
 
 ## 
 
-## &#x20;  B. Corresponding Author:
-
-## &#x20;     Name: Rongfeng Cui
-
-## &#x20;     Institution: School of Ecology \& State Key Laboratory of Biocontrol, Sun Yat-Sen University; Southern Marine Science and Engineering Guangdong Laboratory (Zhuhai)
-
-## &#x20;     Email: cuirf@mail.sysu.edu
+## \*\*3. Date of data collection:\*\* 2025-07-30
 
 ## 
 
-## 3\. Date of data collection: 2025-07-30
+## \*\*4. Geographic location of data collection:\*\* East China Sea (Bombay Duck, BD) and South China Sea (Brushtooth lizardfish, BL)
 
 ## 
 
-## 4\. Geographic location of data collection: East China Sea (Bombay Duck, BD) and South China Sea (Brushtooth lizardfish, BL)
+## \*\*5. Information about funding sources:\*\* This work was funded by National Natural Science Foundation of China (42576110 to B.K., 32171602 to R.C.)
 
 ## 
 
-## 5\. Information about funding sources: This work was funded by National Natural Science Foundation of China (42576110 to B.K., 32171602 to R.C.)
+## \*\*6. License information:\*\* \[MIT License](https://opensource.org/licenses/MIT)
 
 ## 
 
-## 6\. License information: MIT License (https://opensource.org/licenses/MIT)
+## \*\*7. DOI for data and code repository:\*\* \[10.5281/zenodo.22291906](https://doi.org/10.5281/zenodo.22291906)
 
 ## 
 
-## 7\. DOI for data and code repository: 10.5281/zenodo.22291906
+## \## DATA \& FILE OVERVIEW
 
 ## 
 
-## 
+## \*\*1. File List:\*\*
 
-## DATA \& FILE OVERVIEW
+## \*   `01\_Genome\_Assembly/`: DNA filtering, assembly scripts, and Hi-C scaffolding pipeline.
 
-## 
+## \*   `02\_Genome\_Annotation/`: Repeat masking, gene model generation, and functional annotation scripts.
 
-## 1\. File List: 
+## \*   `03\_Comparative\_Genomics/`: Orthology analysis, phylogeny construction, and selection tests.
 
-## &#x20;   01\_Genome\_Assembly/: DNA filtering, assembly scripts, and Hi-C scaffolding pipeline.
+## \*   `04\_Population\_Genetics/`: SNP calling workflow (GATK), PCA, Admixture, PSMC, and ROH analysis.
 
-## &#x20;   02\_Genome\_Annotation/: Repeat masking, gene model generation, and functional annotation scripts.
-
-## &#x20;   03\_Comparative\_Genomics/: Orthology analysis, phylogeny construction, and selection tests.
-
-## &#x20;   04\_Population\_Genetics/: SNP calling workflow (GATK), PCA, Admixture, PSMC, and ROH analysis.
-
-## &#x20;   05\_Functional\_Analysis/: Selective sweep detection (diploS/HIC) and deleterious variant assessment (SnpEFF).
+## \*   `05\_Functional\_Analysis/`: Selective sweep detection (diploS/HIC) and deleterious variant assessment (SnpEFF).
 
 ## 
 
-## 2\. Relationship between files: 
+## \*\*2. Relationship between files:\*\*
 
-## &#x20;   The analysis consists of independent, modular scripts. Users should execute them sequentially according to the logical order of the directories (01 to 05). Please ensure file paths in each script are updated to match your local file system.
-
-## 
-
-## 3\. Additional related data: 
-
-## &#x20;   The BD genome assembly and population resequencing data are available in the China National GeneBank DataBase (CNGBdb) CNSA under the accession number CNP0007843. The BL genome assembly and raw data are deposited in CNGBdb CNSA under the accession number CNP0007838.
-
-## Additionally, sequencing data related to the BD genome assembly have been deposited in the National Center for Biotechnology Information (NCBI) BioProject database under the following accession numbers: PRJNA784345 (Hi-C data), PRJNA784315 (NGS data), and PRJNA784648 (PacBio HiFi data).
+## The analysis consists of independent, modular scripts. Users should execute them sequentially according to the logical order of the directories (01 to 05). Please ensure file paths in each script are updated to match your local file system.
 
 ## 
 
-## 
+## \*\*3. Additional related data:\*\*
 
-## 4\. Are there multiple versions of the dataset? No
+## The BD genome assembly and population resequencing data are available in the China National GeneBank DataBase (CNGBdb) CNSA under the accession number \*\*CNP0007843\*\*. The BL genome assembly and raw data are deposited in CNGBdb CNSA under the accession number \*\*CNP0007838\*\*.
 
-## 
-
-## 
-
-## METHODOLOGICAL INFORMATION
+## Additionally, sequencing data related to the BD genome assembly have been deposited in the National Center for Biotechnology Information (NCBI) BioProject database under the following accession numbers: \*\*PRJNA784345\*\* (Hi-C data), \*\*PRJNA784315\*\* (NGS data), and \*\*PRJNA784648\*\* (PacBio HiFi data).
 
 ## 
 
-## 1\. Description of methods: 
-
-## &#x20;   Methods include de novo genome assembly using long reads and Hi-C scaffolding. Gene models were predicted via integrated RNA-seq evidence. Comparative genomics were used to investigate evolutionary history. Population dynamics were assessed using 48 resequenced individuals, GATK-based SNP calling, and historical demographic inference (PSMC). Recent selective sweeps were identified using CNN-based diploS/HIC.
+## \*\*4. Are there multiple versions of the dataset?\*\* No
 
 ## 
 
-## 2\. Instrument- or software-specific information: 
-
-## &#x20;   - Primary Tools: NextDenovo (v2.5.0), NextPolish (v1.4.1), BWA (v0.7.8), Funannotate (v1.8.9), OrthoFinder (v2.3.3), CAFE5 (v5.0), HyPhy (v2.5.10), GATK (v4.2.1.0), PSMC (v0.6.5), diploS/HIC (v1.0), SnpEFF (v5.1d).
-
-## &#x20;   - R Packages: ggplot2 (v3.5.1), BEDMatrix (v2.0.3), popkin (v1.3.23), org.Dr.eg.db (v3.14.0), org.Hs.eg.db (v3.14.0), clusterProfiler (v4.2.2).
-
-## &#x20;   - Environment: Analyses were performed on a Linux cluster using Conda environments.
+## \## METHODOLOGICAL INFORMATION
 
 ## 
+
+## \*\*1. Description of methods:\*\*
+
+## Methods include de novo genome assembly using long reads and Hi-C scaffolding. Gene models were predicted via integrated RNA-seq evidence. Comparative genomics were used to investigate evolutionary history. Population dynamics were assessed using 48 resequenced individuals, GATK-based SNP calling, and historical demographic inference (PSMC). Recent selective sweeps were identified using CNN-based diploS/HIC.
+
+## 
+
+## \*\*2. Instrument- or software-specific information:\*\*
+
+## \*   \*\*Primary Tools:\*\* NextDenovo (v2.5.0), NextPolish (v1.4.1), BWA (v0.7.8), Funannotate (v1.8.9), OrthoFinder (v2.3.3), CAFE5 (v5.0), HyPhy (v2.5.10), GATK (v4.2.1.0), PSMC (v0.6.5), diploS/HIC (v1.0), SnpEFF (v5.1d).
+
+## \*   \*\*R Packages:\*\* ggplot2 (v3.5.1), BEDMatrix (v2.0.3), popkin (v1.3.23), org.Dr.eg.db (v3.14.0), org.Hs.eg.db (v3.14.0), clusterProfiler (v4.2.2).
+
+## \*   \*\*Environment:\*\* Analyses were performed on a Linux cluster using Conda environments.
 
