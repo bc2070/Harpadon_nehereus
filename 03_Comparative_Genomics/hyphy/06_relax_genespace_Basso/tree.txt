@@ -1,0 +1,1 @@
+((Takifugu_rubripes{R},(((Harpadon_nehereus{T},Saurida_undosquamis{R}){R},((Lepisosteus_oculatus{R},Clupea_harengus{R}){R},Danio_rerio{R}){R}){R},Hippocampus_comes{R}){R}){R},((Liparis_tanakae{R},Pseudoliparis_swirei{R}){R},Gasterosteus_aculeatus{R}){R},Chaenocephalus_aceratus{R}){R};

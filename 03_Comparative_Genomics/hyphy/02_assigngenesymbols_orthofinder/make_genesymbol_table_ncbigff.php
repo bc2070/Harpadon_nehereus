@@ -1,57 +1,51 @@
 <?php
-$sList = "ncbi_gffs.txt";
+// input file with taxon names and gff paths
+$slist = "gffs1.txt";
+$hlist = fopen($slist, 'r');
 
-$hList = fopen($sList, 'r');
-
-while( false !== ($sLn = fgets($hList) ) ) {
-	$sLn = trim($sLn);
-	if ($sLn == '') continue;
-	list($sTaxon, $sGff) = explode("\t" , $sLn);
-	$hOut = fopen($sTaxon.".id2genesymbol.map.txt" , 'w');
-	$arrID2Symbol = fnProcess($hOut, $sGff); 
-
+while( false !== ($sln = fgets($hlist) ) ) {
+	$sln = trim($sln);
+	if ($sln == '') continue;
+	list($staxon, $sgff) = explode("\t" , $sln);
+	$hout = fopen($staxon.".id2genesymbol.map.txt" , 'w');
+	fnprocess($hout, $sgff); 
 }
 
+// extract gene symbols and product names from gff
+function fnprocess($hout, $sgff) {
+	$hgff = popen("zcat -f $sgff", 'r');
 
-function fnProcess($hOut, $sGff) {
-	$hGff = popen("zcat -f $sGff", 'r');
+	while( false !== ($sln = fgets($hgff ) ) ) {
+		if (strpos($sln, '#') === 0) continue;
+		$sln = trim($sln);
+		if ($sln == '') continue;
 
-	while( false !== ($sLn = fgets($hGff ) ) ) {
-		if ($sLn == '#') continue;
-		$sLn = trim($sLn);
-		if ($sLn == '') continue;
-
-		$arrF = explode("\t" , $sLn);
-
-		if (count($arrF) != 9) continue;
+		$arrf = explode("\t" , $sln);
+		if (count($arrf) != 9) continue;
 		
-		if ($arrF[2] == 'mRNA') {
-			$arrAnnot = fnParseFields($arrF[8]);
-			if (!array_key_exists("ID" , $arrAnnot) ) continue;
-			$sGeneSymbol =  (array_key_exists("gene" , $arrAnnot) )? $arrAnnot['gene'] : 'unknown';
-			$sGeneFullName =  (array_key_exists("product" , $arrAnnot) )? $arrAnnot['product'] : 'unknown';
-			list($sID) = explode('.', $arrAnnot['ID']);
-			fwrite($hOut , $sID . "\t" . $sGeneSymbol . "\t" . $sGeneFullName  . "\n"  );
+		// parse mrna attributes for symbol and product
+		if ($arrf[2] == 'mRNA') {
+			$arrannot = fnparsefields($arrf[8]);
+			if (!array_key_exists("ID" , $arrannot) ) continue;
+			
+			$sgenesymbol = array_key_exists("gene" , $arrannot) ? $arrannot['gene'] : 'unknown';
+			$sgenefullname = array_key_exists("product" , $arrannot) ? $arrannot['product'] : 'unknown';
+			list($sid) = explode('.', $arrannot['ID']);
+			
+			fwrite($hout , $sid . "\t" . $sgenesymbol . "\t" . $sgenefullname  . "\n"  );
 			continue;
 		}
-
-
 	}
-
-
-
-	
 }
 
-function fnParseFields($s) {
-	$arrF1 = explode(";" , $s);
-	$arrRet = array();
-	foreach($arrF1 as $sF) {
-		$arrF2 = explode("=" , $sF);
-		$arrRet[trim($arrF2[0]) ] = trim($arrF2[1]);
+// split gff attribute fields
+function fnparsefields($s) {
+	$arrf1 = explode(";" , $s);
+	$arrret = array();
+	foreach($arrf1 as $sf) {
+		$arrf2 = explode("=" , $sf);
+		if (count($arrf2) == 2) $arrret[trim($arrf2[0])] = trim($arrf2[1]);
 	}
-
-	return $arrRet;
+	return $arrret;
 }
-
 ?>
