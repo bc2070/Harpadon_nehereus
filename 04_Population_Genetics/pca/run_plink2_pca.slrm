@@ -1,0 +1,48 @@
+#!/usr/bin/bash
+#SBATCH --job-name=PCA_Relaxed
+#SBATCH -p long
+#SBATCH -c 8
+#SBATCH --mem=80G
+#SBATCH -o aps-%j.out
+#SBATCH -e aps-%j.err
+
+VCF="all.samples.vcf.gz"
+CLEAN_VCF="all.samples.cleaned.vcf.gz"
+PREFIX="LTY_PCA_v2"
+THREADS=$SLURM_CPUS_PER_TASK
+MEM_LIMIT=72000 
+
+
+bcftools annotate -x QUAL "$VCF" --threads "$THREADS" -Ou | \
+bcftools view -v snps -m2 -M2 --threads "$THREADS" -Oz -o "$CLEAN_VCF"
+
+SAMPLE_COUNT=$(bcftools query -l "$CLEAN_VCF" | wc -l)
+
+plink2 --vcf "$CLEAN_VCF" \
+       --double-id \
+       --set-all-var-ids @:# \
+       --new-id-max-allele-len 500 \
+       --maf 0.01 \
+       --geno 0.2 \
+       --mind 0.2 \
+       --allow-extra-chr \
+       --make-pgen \
+       --threads "$THREADS" \
+       --memory "$MEM_LIMIT" \
+       --out "${PREFIX}_raw"
+
+plink2 --pfile "${PREFIX}_raw" \
+       --indep-pairwise 50 5 0.2 \
+       --allow-extra-chr \
+       --threads "$THREADS" \
+       --memory "$MEM_LIMIT" \
+       --out "${PREFIX}_ld_prune"
+
+plink2 --pfile "${PREFIX}_raw" \
+       --extract "${PREFIX}_ld_prune.prune.in" \
+       --pca 20 \
+       --allow-extra-chr \
+       --threads "$THREADS" \
+       --memory "$MEM_LIMIT" \
+       --out "${PREFIX}_final"
+
