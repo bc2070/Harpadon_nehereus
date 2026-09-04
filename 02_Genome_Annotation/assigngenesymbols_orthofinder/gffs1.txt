@@ -1,0 +1,4 @@
+HarpadonNehereus	/data/projects/dyao/Data/Harpadon_nehereus/synteny/00.species/Harpadon_nehereus/Harpadon_nehereus.longest_isoform.gff3
+LiparisTanakae	/data/projects/dyao/Data/Harpadon_nehereus/synteny/longest_isoform_prot_fa/Liparis_tanakae_getprot/Liparis_tanakae.gff3
+PseudoliparisSwirei	/data/projects/dyao/Data/Harpadon_nehereus/synteny/longest_isoform_prot_fa/Pseudoliparis_swirei_getprot/Pseudoliparis_swirei.gff3
+SauridaUndosquamis	/data/projects/dyao/Data/Harpadon_nehereus/synteny/00.species/Saurida_undosquamis/Saurida_undosquamis.longest_isoform.gff3
