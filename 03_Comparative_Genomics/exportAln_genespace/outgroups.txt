@@ -1,0 +1,12 @@
+#name	cds
+Chaenocephalus_aceratus	/data/projects/dyao/Data/Harpadon_nehereus/synteny/species_isoform/Chaenocephalus_aceratus.longest_isoform.cds.fa
+Clupea_harengus	/data/projects/dyao/Data/Harpadon_nehereus/synteny/species_isoform/Clupea_harengus.longest_isoform.cds.fa
+Danio_rerio	/data/projects/dyao/Data/Harpadon_nehereus/synteny/species_isoform/Danio_rerio.longest_isoform.cds.fa
+Gasterosteus_aculeatus	/data/projects/dyao/Data/Harpadon_nehereus/synteny/species_isoform/Gasterosteus_aculeatus.longest_isoform.cds.fa
+Hippocampus_comes	/data/projects/dyao/Data/Harpadon_nehereus/synteny/species_isoform/Hippocampus_comes.longest_isoform.cds.fa
+Lepisosteus_oculatus	/data/projects/dyao/Data/Harpadon_nehereus/synteny/species_isoform/Lepisosteus_oculatus.longest_isoform.cds.fa
+Liparis_tanakae	/data/projects/dyao/Data/Harpadon_nehereus/synteny/longest_isoform_prot_fa/Liparis_tanakae_getprot/Liparis_tanakae.longest_isoform.cds.fa
+Pseudoliparis_swirei	/data/projects/dyao/Data/Harpadon_nehereus/synteny/longest_isoform_prot_fa/Pseudoliparis_swirei_getprot/Pseudoliparis_swirei.longest_isoform.cds.fa
+Saurida_undosquamis	/data/projects/dyao/Data/Harpadon_nehereus/synteny/species_isoform/Saurida_undosquamis.longest_isoform.cds.fa
+Takifugu_rubripes	/data/projects/dyao/Data/Harpadon_nehereus/synteny/species_isoform/Takifugu_rubripes.longest_isoform.cds.fa
+Harpadon_nehereus	/data/projects/dyao/Data/Harpadon_nehereus/synteny/00.species/Harpadon_nehereus/Harpadon_nehereus.longest_isoform.cds.fa
