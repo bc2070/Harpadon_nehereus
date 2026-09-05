@@ -35,6 +35,9 @@ Additionally, sequencing data related to the BD genome assembly have been deposi
 
 4. Are there multiple versions of the dataset? No
 
+5.  Correspondence between Code, Results, and Figures：
+	The five code modules correspond to the major results and figures of the manuscript. `01_Genome_Assembly/` and `02_Genome_Annotation/` cover genome assembly, chromosome scaffolding, repeat annotation, and gene annotation, corresponding to Results 3a, Figure 1A. `03_Comparative_Genomics/` covers orthology, phylogeny, divergence time, gene family evolution, RELAX, positive selection, and GO enrichment, corresponding to Results 3b–3e, Figures 1B–C and 3A–C. `04_Population_Genetics/` covers SNP calling, population structure, nucleotide diversity, demographic history, relatedness, and ROH, corresponding to Results 3b and Figure 2A–F. `05_Functional_Analysis/` covers deleterious variants and recent selective sweeps, corresponding to Results 3f. Together, these modules provide the analyses underlying the main and supplementary figures and tables presented in the manuscript.
+
 
 METHODOLOGICAL INFORMATION
 
