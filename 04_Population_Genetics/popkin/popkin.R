@@ -1,27 +1,37 @@
-setwd("/data2/projects/dyao/lty_snp/03.gatk/01_joined_genotype1/popkin_relatedness");
+# set working directory
+setwd("/data2/projects/dyao/lty_snp/03.gatk/01_joined_genotype1/popkin_relatedness")
+
+# load required packages
 library(BEDMatrix)
 library(popkin)
 
+# load genotype data from bed file
 X <- BEDMatrix("lty_converted.bed")
 dim(X)
+
+# estimate kinship matrix
 kinship <- popkin(X)
+
+# plot kinship matrix
 plot_popkin(
   kinship, 
-  # shared bottom and left margin value, to make space for labels
   mar = 1
 )
 
-hist(kinship);
-write.table(kinship, file = "kinship.tsv", quote = F, row.names = T, col.names = T, sep = "\t")
-#inbr(kinship)
+# display histogram of kinship values
+hist(kinship)
 
-write.table(inbr_diag(kinship), file = "kinship_diaginbrdcoef.tsv", quote = F, row.names = T, col.names = T, sep = "\t")
+# write full kinship matrix to tsv
+write.table(kinship, file = "kinship.tsv", quote = FALSE, row.names = TRUE, col.names = TRUE, sep = "\t")
 
+# write inbreeding coefficients to tsv
+write.table(inbr_diag(kinship), file = "kinship_diaginbrdcoef.tsv", quote = FALSE, row.names = TRUE, col.names = TRUE, sep = "\t")
 
+# calculate pairwise fst from kinship
 pairwise_fst <- pwfst(kinship)
 
+# plot pairwise fst matrix
 leg_title <- expression(paste('Pairwise ', F[ST]))
-# NOTE no need for inbr_diag() here!
 plot_popkin(
   pairwise_fst,
   labs_even = TRUE,

@@ -11,6 +11,7 @@ SPECIES="pachycara"
 STRAIN="deep_sea_1" 
 CPU=24
 
+# run funannotate training pipeline
 funannotate train -i $GENOME -o trained_1  \
 --left /public3/group_crf/home/g22yaodj3/Data/pachycara/08_funannotate/05_funannotate_miniprot/left.fq.gz \
 --right /public3/group_crf/home/g22yaodj3/Data/pachycara/08_funannotate/05_funannotate_miniprot/right.fq.gz  \

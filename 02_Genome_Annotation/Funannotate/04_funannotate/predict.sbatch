@@ -11,6 +11,7 @@ PROTEIN_EVIDENCE=/public3/group_crf/home/g22yaodj3/Data/pachycara/07_genewise/al
 SPECIES="pachycara"
 CPU=64
 
+# execute gene prediction
  funannotate predict --force  -i $GENOME \
             -o trained_2 -s "$SPECIES" --cpus $CPU \
 --max_intronlen 200000 \
@@ -20,11 +21,7 @@ CPU=64
 --busco_seed_species zebrafish \
 --organism other \
 --protein_evidence  $PROTEIN_EVIDENCE \
-#--stringtie $STRINGTIE \
 --keep_no_stops \
 --min_protlen 10 \
 --repeat_filter none
-#--repeats2evm \
-#--no-evm-partitions \
-# StartWeights = {'augustus': 1, 'hiq': 2, 'genemark': 1, 'pasa': 6,'codingquarry': 0, 'snap': 1, 'glimmerhmm': 1, 'proteins': 1, 'transcripts': 1}
 

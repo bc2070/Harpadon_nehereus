@@ -11,6 +11,7 @@ SPECIES="pachycara"
 STRAIN="deep_sea"
 CPU=64
 
+# run funannotate training pipeline
 funannotate train -i $GENOME -o trained_1  \
 --left left.fq.gz \
 --right right.fq.gz  \

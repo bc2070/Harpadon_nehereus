@@ -7,8 +7,9 @@ ASSEMBLY=/data/projects/dyao/Data/pachycara/08_funannotate/01_cleangenome/pachyc
 REPBASELIB=`realpath ./all_te.fa` #repeat library, with killifish repeats
 THREADS=36
 
+# link assembly file
 ln -sf $ASSEMBLY scf.fa
 
-
+# run repeatmasker with custom library
 singularity run docker://dfam/tetools:latest RepeatMasker -gff -html -pa $THREADS -lib $REPBASELIB  scf.fa
 

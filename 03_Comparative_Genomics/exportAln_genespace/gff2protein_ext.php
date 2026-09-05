@@ -1,52 +1,44 @@
 <?php
 require_once(dirname(__FILE__) . "/lib.php");
+
+// default input and output paths
 $sMakerGFF = "chimericfixed.gff";
 $sGenome = "query.fa";
 $sOutFasta = "chimericfixed.protein.fa";
 $sOutTransFasta = "chimericfixed.transcript.fa";
 
-//This script also delete 5' and 3'  uncertainties and will use N to mask all huge gaps. small and big gaps are left in 
+// handles sequence trimming of 5' and 3' uncertainties and masks large gaps with N/X
 
+// parse command line arguments
 while(count($argv) > 0) {
     $arg = array_shift($argv);
     switch($arg) {
-        case '-R':
-            $sGenome = trim(array_shift($argv));
-            break;
-	case '-M':
-	    $sMakerGFF  = trim(array_shift($argv));
-	    break;
-	case '-o':
-	    $sOutFasta  = trim(array_shift($argv));
-	    break;
-	case '-t':
-	    $sOutTransFasta  = trim(array_shift($argv));
-	    break;
-
+        case '-R': $sGenome = trim(array_shift($argv)); break;
+        case '-M': $sMakerGFF  = trim(array_shift($argv)); break;
+        case '-o': $sOutFasta  = trim(array_shift($argv)); break;
+        case '-t': $sOutTransFasta  = trim(array_shift($argv)); break;
     }
 }
 
-
+// initialize output file handles
 $hOutFasta = fopen($sOutFasta , "w");
 $hOutTransFasta = fopen($sOutTransFasta , "w");
 
+// load gff data for sequence extraction
 $oMakerGFF = new MappedCDSGFF();
-
-
 $oMakerGFF->LoadGFF($sMakerGFF , $sGenome);
 
+// retrieve all gene models
+$arrGenes = $oMakerGFF->GetGenes('maker');
 
-$arrGenes = $oMakerGFF->GetGenes('maker'); // get all maker genes
-
-$arrDeleteGenes = array();
+// process genes and extract sequences
 foreach($arrGenes as $sGeneID => &$oGene) {
-
 	foreach($oGene['mRNAs'] as $smRNAID => &$omRNA) {
 		$oExtracted = $oMakerGFF->ExtractmRNASequence('maker' , $smRNAID);
 		$sTrimAA = $oExtracted['AA'];
 		$sTrimDNA = $oExtracted['mRNA'];
 
-		//mask huge gaps:
+		// mask huge gaps in protein and transcript sequences
 		if (array_key_exists('hugeinsertionlist', $omRNA['annot'])) {
 			$arrHugeInsList = explode(",", $omRNA['annot']['hugeinsertionlist']);
 			foreach($arrHugeInsList as $sHugeGap) {
@@ -60,27 +52,19 @@ foreach($arrGenes as $sGeneID => &$oGene) {
 			}
 		}
 
+		// determine 5' and 3' terminal uncertainty lengths
 		$n5PrimeUncertain = 0;
 		$n3PrimeUncertain = 0;
-		if (array_key_exists('5primeuncertain', $omRNA['annot'])) {
-			$n5PrimeUncertain = intval($omRNA['annot']['5primeuncertain']);
-		}
+		if (array_key_exists('5primeuncertain', $omRNA['annot'])) $n5PrimeUncertain = intval($omRNA['annot']['5primeuncertain']);
+		if (array_key_exists('3primeuncertain', $omRNA['annot'])) $n3PrimeUncertain = intval($omRNA['annot']['3primeuncertain']);
 
-		if (array_key_exists('3primeuncertain', $omRNA['annot'])) {
-			$n3PrimeUncertain = intval($omRNA['annot']['3primeuncertain']);
-		}
+		// trim sequences by removing uncertain terminal regions
+		$sTrimAA = substr($sTrimAA , $n5PrimeUncertain , strlen($sTrimAA) - $n5PrimeUncertain - $n3PrimeUncertain );
+		$sTrimDNA = substr($sTrimDNA , $n5PrimeUncertain * 3 , strlen($sTrimDNA) - ($n5PrimeUncertain*3) - ($n3PrimeUncertain*3) );
 
-		//trim off 3'
-		$sTrimAA = substr($sTrimAA , 0 , strlen($sTrimAA) - $n3PrimeUncertain );
-		$sTrimDNA = substr($sTrimDNA , 0 , strlen($sTrimDNA) - ($n3PrimeUncertain*3) );
-		//trim off 5'
-		$sTrimAA = substr($sTrimAA , $n5PrimeUncertain );
-		$sTrimDNA = substr($sTrimDNA ,  $n5PrimeUncertain * 3 );
-
+		// write processed sequences to fasta files
 		fwrite($hOutFasta , ">$smRNAID\n".wordwrap($sTrimAA  , 75, "\n", true)."\n");
 		fwrite($hOutTransFasta , ">$smRNAID\n".wordwrap($sTrimDNA , 75, "\n", true)."\n");
 	}
-
 }
-
 ?>

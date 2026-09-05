@@ -1,7 +1,10 @@
 <?php
+// file paths for input mapping data
 $sGeneSpace = "/data2/projects/dyao/compare/hyphy/01_genespace/rundir/results/gffWithOgs.txt.gz";
 $sGeneSymbolMap = "/data2/projects/dyao/compare/hyphy/02_assigngenesymbols_orthofinder/orthofinder_genesymbols.tsv";
 $sRNAID2SpGeneIDMap = "/data2/projects/dyao/compare/hyphy/03_othersp_protein/allproteins.fa";
+
+// species name standardization
 $arrTaxTranslate = array('AnabasTestudineus' => 'Anabas_testudineus',
 'AnarrhichthysOcellatus' => 'Anarrhichthys_ocellatus',
 'BassozetusSp' => 'Bassozetus_sp',
@@ -27,125 +30,120 @@ $arrTaxTranslate = array('AnabasTestudineus' => 'Anabas_testudineus',
 'XiphophorusMaculatus'  => 'Xiphophorus_maculatus'
 );
 $arrTaxTranslateBack = array_flip($arrTaxTranslate);
-$sGeneSymbolIndexSp = "BassozetusSp";
 
+// define focal species for gene symbol assignment
+$sGeneSymbolIndexSp = "BassozetusSp";
 $sOut = "genespace.orthogroups.txt";
 
+// initialize file streams
 $h = popen("zcat $sGeneSpace", 'r');
 $hO = fopen($sOut, 'w');
 
+// load gene identifier mappings
 $arrRNAID2SpGeneID = fnLoadSpGeneIdMap($sRNAID2SpGeneIDMap);
 
 $arrFam = array();
 $arrSpecies = array();
 
+// parse orthogroup data from genespace
 while(false !== ($sLn = fgets($h)) ) {
-						$sLn = trim($sLn);
-						if ($sLn == "") continue;
-						
-					 $arrF = explode("\t", $sLn);
-					 if ($arrF[0] == 'genome') continue;
-					 $sSpecies = $arrF[0];
-					 $sOrthoFam = $arrF[13];
-					 $bIsRepresent = ($arrF[11]=='TRUE');
+    $sLn = trim($sLn);
+    if ($sLn == "") continue;
+    
+    $arrF = explode("\t", $sLn);
+    if ($arrF[0] == 'genome') continue;
+    
+    $sSpecies = $arrF[0];
+    $sOrthoFam = $arrF[13];
+    $bIsRepresent = ($arrF[11]=='TRUE');
+    $sGeneID = $arrF[1];
 
-					 $sGeneID = $arrF[1];
+    $sSpecies = (array_key_exists($sSpecies, $arrTaxTranslate) )?  $arrTaxTranslate[$sSpecies] : $sSpecies;
+    
+    // skip non-representative sequences
+    if (!$bIsRepresent) continue;
 
-					 $sSpecies = (array_key_exists($sSpecies, $arrTaxTranslate) )?  $arrTaxTranslate[$sSpecies] : $sSpecies;
-					 if (!$bIsRepresent) {
-					 		continue;
-					 }
+    $arrSpecies[$sSpecies] = true;
+    if (!array_key_exists($sOrthoFam, $arrFam) ) $arrFam[$sOrthoFam] = array();
 
-					 $arrSpecies[$sSpecies] = true;
-					 if (!array_key_exists($sOrthoFam, $arrFam) ) {
-					 		$arrFam[$sOrthoFam] = array();
-					 }
-
-					 if (!array_key_exists($sSpecies, $arrFam[$sOrthoFam])) {
-					 		$arrFam[$sOrthoFam][$sSpecies] = $sGeneID;
-					 } else {
-					 	  echo("Warning: duplicated gene in orthogroup $sOrthoFam in $sSpecies: $sGeneID ".$arrFam[$sOrthoFam][$sSpecies]."\n");
-					 }
+    if (!array_key_exists($sSpecies, $arrFam[$sOrthoFam])) {
+        $arrFam[$sOrthoFam][$sSpecies] = $sGeneID;
+    } else {
+        echo("Warning: duplicated gene in orthogroup $sOrthoFam in $sSpecies: $sGeneID ".$arrFam[$sOrthoFam][$sSpecies]."\n");
+    }
 } 
 
 $arrSpecies = array_keys($arrSpecies);
-
 $arrID2Symbol = fnLoadGeneSymbolMap($sGeneSymbolMap , $sGeneSymbolIndexSp);
-//print_r($arrID2Symbol );
-//die();
 
+// write output header
 fwrite($hO, "OrthoID\tGeneSymbol\tGeneName\t");
 fwrite($hO, implode("\t", $arrSpecies)."\n" );
 
 $sGeneSymbolIndexSp = (array_key_exists($sGeneSymbolIndexSp, $arrTaxTranslate) )?  $arrTaxTranslate[$sGeneSymbolIndexSp] : $sGeneSymbolIndexSp;
 
+// iterate through families and write ortholog table
 foreach($arrFam as $sOrthoFam => $arrSpp) {
-					$sOrthoFam = "Group_".$sOrthoFam."_1";
-					 if (!array_key_exists($sGeneSymbolIndexSp, $arrSpp)) {
-					 		continue; //if the focal species is missing then ignore
-					 }
-					 if (!array_key_exists($arrSpp[$sGeneSymbolIndexSp],$arrID2Symbol )) {
-					 		fwrite($hO, "$sOrthoFam\tunknown\tunknown\t");
-					 } else {
-					 	 fwrite($hO, "$sOrthoFam\t".implode("\t", $arrID2Symbol[$arrSpp[$sGeneSymbolIndexSp]] ) . "\t");
-					 }
-					 $arrSpIDs = array();
-					 foreach($arrSpecies as $sSp) {
-					 				 $sSpGeneId  = $sRNAID = array_key_exists($sSp, $arrSpp)? str_replace('.','_', $arrSpp[$sSp]):'NA';	
-									 if (array_key_exists($sSp, $arrRNAID2SpGeneID ) &&  array_key_exists($sRNAID, $arrRNAID2SpGeneID[$sSp] ) ) {
-									 		$sSpGeneId = $sSp. "|". $arrRNAID2SpGeneID[$sSp][$sRNAID] . "|".$sRNAID;
-									 }
-									  
-					 				 $arrSpIDs[] = $sSpGeneId;					 
-					 }
-
-					 fwrite($hO, implode("\t", $arrSpIDs)."\n" );
+    $sOrthoFam = "Group_".$sOrthoFam."_1";
+    
+    // skip groups missing the focal species
+    if (!array_key_exists($sGeneSymbolIndexSp, $arrSpp)) continue;
+    
+    if (!array_key_exists($arrSpp[$sGeneSymbolIndexSp],$arrID2Symbol )) {
+        fwrite($hO, "$sOrthoFam\tunknown\tunknown\t");
+    } else {
+        fwrite($hO, "$sOrthoFam\t".implode("\t", $arrID2Symbol[$arrSpp[$sGeneSymbolIndexSp]] ) . "\t");
+    }
+    
+    $arrSpIDs = array();
+    foreach($arrSpecies as $sSp) {
+        $sSpGeneId  = $sRNAID = array_key_exists($sSp, $arrSpp)? str_replace('.','_', $arrSpp[$sSp]):'NA';	
+        if (array_key_exists($sSp, $arrRNAID2SpGeneID ) &&  array_key_exists($sRNAID, $arrRNAID2SpGeneID[$sSp] ) ) {
+            $sSpGeneId = $sSp. "|". $arrRNAID2SpGeneID[$sSp][$sRNAID] . "|".$sRNAID;
+        }
+        $arrSpIDs[] = $sSpGeneId;					 
+    }
+    fwrite($hO, implode("\t", $arrSpIDs)."\n" );
 }
 
+// helper to parse gene symbol mapping file
 function fnLoadGeneSymbolMap($sGeneSymbolMap , $sGeneSymbolIndexSp) {
-				 $h = fopen($sGeneSymbolMap, 'r');
-				 $nIdx = -1;
-				 $arrRet = array();
-				 while(false !== ($sLn = fgets($h)) ) {
-						$sLn = trim($sLn);
-						if ($sLn == "") continue;
-						$arrF = explode("\t", $sLn);
-						if ($arrF[0] =='HOG') {
-							 $arrFlip = array_flip($arrF);
-							 if (!array_key_exists($sGeneSymbolIndexSp , $arrFlip)) {
-							 		die("Index species $sGeneSymbolIndexSp not found in $sGeneSymbolMap\n");
-							 }
-							 $nIdx = $arrFlip[$sGeneSymbolIndexSp];
-							 continue;
-						}
+    $h = fopen($sGeneSymbolMap, 'r');
+    $nIdx = -1;
+    $arrRet = array();
+    while(false !== ($sLn = fgets($h)) ) {
+        $sLn = trim($sLn);
+        if ($sLn == "") continue;
+        $arrF = explode("\t", $sLn);
+        if ($arrF[0] =='HOG') {
+            $arrFlip = array_flip($arrF);
+            if (!array_key_exists($sGeneSymbolIndexSp , $arrFlip)) die("Index species $sGeneSymbolIndexSp not found\n");
+            $nIdx = $arrFlip[$sGeneSymbolIndexSp];
+            continue;
+        }
 
-						$sSymbol = $arrF[3];
-						$sGeneName = $arrF[4];
-						$arrIDs = explode(',', $arrF[$nIdx]);
-						foreach($arrIDs as $sID) {
-									 $arrRet[trim($sID)] = array($sSymbol, $sGeneName);
-						}
-				}
-
-				return $arrRet;
+        $sSymbol = $arrF[3];
+        $sGeneName = $arrF[4];
+        $arrIDs = explode(',', $arrF[$nIdx]);
+        foreach($arrIDs as $sID) {
+            $arrRet[trim($sID)] = array($sSymbol, $sGeneName);
+        }
+    }
+    return $arrRet;
 }
 
+// helper to index protein sequences for identifier mapping
 function fnLoadSpGeneIdMap($sRNAID2SpGeneIDMap) {
-				 $h = popen("grep '>' $sRNAID2SpGeneIDMap", 'r');
-				 $arrRet = array();
-				 while(false !== ($sLn = fgets($h)) ) {
-						$sLn = trim($sLn);
-						if ($sLn == "") continue;
-
-						$sLn = substr($sLn, 1);
-						list($sSp, $sSpGeneId, $sRNAID) = explode("|", $sLn);
-						if (!array_key_exists($sSp, $arrRet)) {
-							 $arrRet[$sSp] = array();
-						}
-
-						$arrRet[$sSp][$sRNAID] = $sSpGeneId;
-				 }
-
-				 return $arrRet;
+    $h = popen("grep '>' $sRNAID2SpGeneIDMap", 'r');
+    $arrRet = array();
+    while(false !== ($sLn = fgets($h)) ) {
+        $sLn = trim($sLn);
+        if ($sLn == "") continue;
+        $sLn = substr($sLn, 1);
+        list($sSp, $sSpGeneId, $sRNAID) = explode("|", $sLn);
+        if (!array_key_exists($sSp, $arrRet)) $arrRet[$sSp] = array();
+        $arrRet[$sSp][$sRNAID] = $sSpGeneId;
+    }
+    return $arrRet;
 }
 ?>

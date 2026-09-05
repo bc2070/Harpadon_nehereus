@@ -1,5 +1,5 @@
 <?php
-//this script reads in deduplicated peptide fasta, replace the "." in the ensembl ID with underscore _, and remove all content after the first space. a tab file is output to stderr.
+// read peptide fasta replace dots with underscores remove space content output tab to stderr
 
 $hIn = fopen("php://stdin", "r");
 $hFastOut = fopen("php://stdout", "w");
@@ -30,6 +30,7 @@ do {
         $sSeq .= $sLn;             
 } while(true) ;
 
+// write header to stderr
 fwrite($hTabOut , "GeneID\tLen\tTotalIsoforms\tTranscriptCount\tTranscriptID\tIncluded\tFullheader\n" );
 foreach($arrGeneList as $sGeneID => &$arrTranscripts) {
 	krsort($arrTranscripts , SORT_NUMERIC);
@@ -38,6 +39,7 @@ foreach($arrGeneList as $sGeneID => &$arrTranscripts) {
 	foreach($arrTranscripts as $nLen => &$arrSeq) {
 		$nCount++;
 		$sIncluded = "no";
+		// keep only longest isoform
 		if ($nCount == 1) {
 			fwrite($hFastOut , ">".$arrSeq['ensid']."\n".wordwrap($arrSeq['seq'], 100, "\n" , true)."\n" );
 			$sIncluded = "yes";
@@ -47,6 +49,7 @@ foreach($arrGeneList as $sGeneID => &$arrTranscripts) {
 	}
 }
 
+// parse header and store sequence data
 function fnCheck($sSeqName , $sSeq) {
 	global $arrGeneList;
 	if ($sSeqName == "" || $sSeq == "") return;
@@ -55,7 +58,7 @@ function fnCheck($sSeqName , $sSeq) {
 	$sEnsID = $arrF[0];
 	$sEnsID = str_replace(".", "_", $sEnsID);
 	$sEnsID = str_replace(":", "_", $sEnsID);
-        $sEnsID = str_replace("|", "_", $sEnsID);
+    $sEnsID = str_replace("|", "_", $sEnsID);
 
 	$sGeneID = $sEnsID;
 

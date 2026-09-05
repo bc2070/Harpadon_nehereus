@@ -12,6 +12,7 @@ SPECIES="pachycara"
 STRAIN="deep_sea_1"
 CPU=24
 
+# execute gene prediction
  funannotate predict --force  -i $GENOME \
             -o trained_1 -s "$SPECIES" --cpus $CPU \
 --max_intronlen 200000 \
@@ -21,11 +22,7 @@ CPU=24
 --busco_seed_species zebrafish \
 --organism other \
 --protein_evidence  $PROTEIN_EVIDENCE \
-#--stringtie $STRINGTIE \
 --keep_no_stops \
 --min_protlen 10 \
 --strain "$STRAIN" \
 --repeat_filter none
-#--repeats2evm \
-#--no-evm-partitions \
-# StartWeights = {'augustus': 1, 'hiq': 2, 'genemark': 1, 'pasa': 6,'codingquarry': 0, 'snap': 1, 'glimmerhmm': 1, 'proteins': 1, 'transcripts': 1}

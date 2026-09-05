@@ -6,5 +6,6 @@
 source /public/apps/miniconda3/etc/profile.d/conda.sh
 conda activate funannotate1.8.15
 
+# run funannotate update to refine gene models
 funannotate update -i trained_2 --cpus 64 --pasa_db mysql --alt_transcripts 0.3
 

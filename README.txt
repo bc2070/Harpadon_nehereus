@@ -2,32 +2,18 @@ PAPER TITLE: Genomic mechanisms underlying Bombay Duck's rapid population surge
 
 ABSTRACT: Bombay duck (Harpadon nehereus), once a minor by-catch in the East China Sea, has bloomed into a dominant species, altering marine ecosystems. This study explored the genomic basis of its mysterious recent success via chromosome-level genome assembly, comparative and population genomics. The genome assemblies of H. nehereus and its closely related outgroup species Saurida undosquamis were of good quality, showing a 96.7%~96.8% BUSCO completeness. Population resequencing supports a single panmictic population throughout the coast of China. Expanded gene families, genes under intensified and positive selection are related to osmoregulation, hypoxia tolerance, immune function and reproduction. Recent selective sweeps are mostly related to immune response. These molecular signatures are consistent with long-term adaptations to a hypoxic, polluted and fluctuating environment. These findings suggest that species genomically preadapted to environments affected by global change can suddenly become new native invaders.
 
-PUBLICATION INFORMATION: Proceedings of the Royal Society B
 
 GENERAL INFORMATION
 
 1. Title of Datasets: Bombay_Duck_Genomic_Data
 
-2. Author Information:
-   A. First Author:
-      Name: Bin Kang
-      Institution: Key Laboratory of Mariculture (Ministry of Education) & Fisheries College, Ocean University of China
-      Email: binkang@163.com
+2. Date of data collection: 2025-07-30
 
-   B. Corresponding Author:
-      Name: Rongfeng Cui
-      Institution: School of Ecology & State Key Laboratory of Biocontrol, Sun Yat-Sen University; Southern Marine Science and Engineering Guangdong Laboratory (Zhuhai)
-      Email: cuirf@mail.sysu.edu
+3. Geographic location of data collection: East China Sea (Bombay Duck, BD) and South China Sea (Brushtooth lizardfish, BL)
 
-3. Date of data collection: 2025-07-30
+4. License information: MIT License (https://opensource.org/licenses/MIT)
 
-4. Geographic location of data collection: East China Sea (Bombay Duck, BD) and South China Sea (Brushtooth lizardfish, BL)
-
-5. Information about funding sources: This work was funded by National Natural Science Foundation of China (42576110 to B.K., 32171602 to R.C.)
-
-6. License information: MIT License (https://opensource.org/licenses/MIT)
-
-7. DOI for data and code repository: 10.5281/zenodo.22291906
+5. DOI for data and code repository: 10.5281/zenodo.22291906
 
 
 DATA & FILE OVERVIEW

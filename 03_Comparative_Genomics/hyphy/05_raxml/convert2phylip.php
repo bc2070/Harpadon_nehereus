@@ -1,19 +1,21 @@
 <?php
+// increase memory limit for large alignment processing
 ini_set("memory_limit", "-1");
 
 require_once(dirname(__FILE__) . "/lib.php");
 
 /*
-Test for monophyly constraints present in monophyly_desc.txt
+test for monophyly constraints present in monophyly_desc_txt
 branch marking styles:
-hyphy relax: target NodeName{T}, or (A{T},B{T}){T} . reference {R}, do not use {U}
-Codeml style: marks all child branches as foreground: $1 (not used in this script) , marks only the one branch as foreground: #1 
+hyphy relax: target nodename{t} or (a{t},b{t}){t} reference {r} do not use {u}
+codeml style: marks all child branches as foreground: $1 (not used) marks one branch as foreground: #1 
 */
 
 $sPremadeFasta = "ret_improved_cleanDNA.fasta";
 $sOutDIR = "./phylipformat";
-$nMin4FoldPerc = 0.5; //if 50% of the taxa shows 4fold amino acid, count as 4fold
+$nMin4FoldPerc = 0.5; // threshold for 4-fold degenerate site inclusion
 
+// parse command line arguments
 while(count($argv) > 0) {
     $arg = array_shift($argv);
     switch($arg) {
@@ -29,24 +31,19 @@ while(count($argv) > 0) {
         case '-S':
             $sGeneSymbolMap  = trim(array_shift($argv));
             break;
-
     }
 }
 
-
-
+// ensure output directory exists
 exec("mkdir -p $sOutDIR");
 
-
 $hPremadeFasta = fopen($sPremadeFasta , "r");
-$sLn = "";
-
 $sSeqName = "";
 $sSeq = "";
 $arrFullCodingSeq = array();
 $sCurrentGene = "";
-$nGeneCount = -1;
 
+// define output file handles
 $sOutFileFull = "$sOutDIR/full.phy";
 $sOutFile4Fold = "$sOutDIR/4fold.phy";
 $sOutFileCodon12 = "$sOutDIR/codon12.phy";
@@ -58,6 +55,7 @@ $hOutCodon12 = fopen($sOutFileCodon12 , 'w');
 $arrProccessedAln = array();
 $arrTaxaList = array();
 
+// read fasta records
 do {
 	$sLn = fgets($hPremadeFasta);
 
@@ -71,7 +69,6 @@ do {
 		fnProcessRecord($sSeqName, $sSeq);
 		$sSeqName = substr($sLn , 1);
 		$sSeq = "";
-		
 	} else {
 		$sSeq .= $sLn;
 	}
@@ -79,35 +76,25 @@ do {
 } while (true);
 fnProcessAln($sCurrentGene,$arrFullCodingSeq);
 
-echo("Genes for each taxon:\n");
+// output gene counts per taxon
+echo("genes for each taxon:\n");
 foreach($arrTaxaList as $sTaxon => $nGeneCount) {
 	echo("$sTaxon\t$nGeneCount\n");
 }
 
+// write phylip formatted files
 fnWritePhylip($arrProccessedAln['cleancols'], $hOutFull);
 fnWritePhylip($arrProccessedAln['pos12'], $hOutCodon12);
 fnWritePhylip($arrProccessedAln['4fold'], $hOut4fold);
 
-
-
+// parse fasta headers and aggregate sequences by gene
 function fnProcessRecord($sSeqName, $sSeq) {
 	global $arrFullCodingSeq , $sCurrentGene;
 	if (strpos($sSeqName , "direction") !== false  ) {
-		return; //don't process fragments
+		return; 
 	}
 
 	preg_match("/Ortho:(\S+);Sp:(\S+);MappedToRef:(\S+);SpGeneId:(\S+);GroupId:(\S+)/",  $sSeqName, $arrParsed);
-/*
-array(6
-0	=>	Ortho:0;Sp:AAU;MappedToRef:AAU;SpGeneId:029799;GroupId:Group_0_0
-1	=>	0
-2	=>	AAU
-3	=>	AAU
-4	=>	029799
-5	=>	Group_0_0
-)
-
-*/
 
 	if (count($arrParsed)!=6 ) {
 		return;
@@ -119,7 +106,6 @@ array(6
 		if (!array_key_exists($sSpecies , $arrFullCodingSeq)) {
 			$arrFullCodingSeq[$sSpecies] = "";
 		}
-
 		$arrFullCodingSeq[$sSpecies] .= $sSeq;
 	} else {
 		if (count($arrFullCodingSeq) > 0) {
@@ -129,10 +115,9 @@ array(6
 		$sCurrentGene = $sGeneName;
 		$arrFullCodingSeq[$sSpecies] = $sSeq;
 	}
-
 }
 
-
+// partition alignments into full codon, pos12, and 4-fold degenerate
 function fnProcessAln($sGeneName,$arrFullCodingSeq) {
 	global $arrProccessedAln, $arrTaxaList, $nMin4FoldPerc;
 	
@@ -140,7 +125,7 @@ function fnProcessAln($sGeneName,$arrFullCodingSeq) {
 	$nAlnLen = strlen($arrFullCodingSeq[$arrTaxa[0]]);
 
 	if ($nAlnLen % 3 != 0) {
-		die("Error: Gene $sGeneName not a multiplication of 3!\n");
+		die("error: gene $sGeneName not a multiplication of 3\n");
 	}
 
 	$arrRetCol = array();
@@ -153,42 +138,31 @@ function fnProcessAln($sGeneName,$arrFullCodingSeq) {
 		}
 		$arrTaxaList[$sTaxon]++;
 		if (strlen($arrFullCodingSeq[$sTaxon]) != $nAlnLen ) {
-			die("Error: Gene $sGeneName unequal length at taxon $sTaxon ! check if properly aligned!\n");
+			die("error: gene $sGeneName unequal length at taxon $sTaxon\n");
 		}
-
 		$arrRetCol[$sTaxon] = '';
 		$arrRetPos12[$sTaxon] = '';
 		$arrRet4fold[$sTaxon] = '';
-		
 	}
 
-	//go over each alignment column.
-
-
+	// process alignment by codon
 	for($nPos=0;$nPos<$nAlnLen; $nPos+=3) {
 		$arrCol = array();
 		$arrPos12 = array();
 		$arrLastPos = array();
 		$n4foldTaxa = 0;
-		//$sFirstTwoPos = "";
+		
 		foreach($arrFullCodingSeq as $sTaxon => $sSeq) {
 			$sCodon = substr($sSeq, $nPos, 3);
 			$bIs4Fold = fnIs4FoldDegen($sCodon);
 			if ($bIs4Fold === -1) {
-				continue 2; //skip this position due to missing data
+				continue 2; 
 			}
-			/*if ($bIs4Fold === true && $sFirstTwoPos=='') {
-				$sFirstTwoPos = substr($sCodon, 2);
-			}
-			if ($bIs4Fold === true && $sFirstTwoPos!='') {
-				$bIs4Fold = (substr($sCodon, 2) == $sFirstTwoPos);
-			}*/
 
 			if ($bIs4Fold) {
 				$n4foldTaxa++;
 			}
 
-			//$bAll4fold = $bAll4fold && $bIs4Fold;
 			$arrCol[$sTaxon] = $sCodon;
 			$arrPos12[$sTaxon] = substr($sCodon, 0,2);
 			$arrLastPos[$sTaxon] = $sCodon[2];
@@ -201,94 +175,14 @@ function fnProcessAln($sGeneName,$arrFullCodingSeq) {
 				$arrRet4fold[$sTaxon] .= $arrLastPos[$sTaxon];
 			}
 		}
-		
 	}
 
 	$arrProccessedAln['cleancols'][$sGeneName] = $arrRetCol;
 	$arrProccessedAln['pos12'][$sGeneName] = $arrRetPos12;
 	$arrProccessedAln['4fold'][$sGeneName] = $arrRet4fold;
-	
 }
 
-
-
-
-function fnLoadCurrentRet($sOutFile ) {
-
-	$arrRet = array();
-
-	if (!file_exists($sOutFile) ) {
-		return $arrRet;
-	}
-
-	$hPrevOut = fopen($sOutFile , 'r');
-
-	while( false !== ($sLn = fgets($hPrevOut) ) ) {
-		$sLn = trim($sLn);
-		if ($sLn == '') continue;
-		$arrF = explode("\t", $sLn);
-		$arrRet[$arrF[0]] = $arrF;
-	}
-	fclose($hPrevOut);
-
-//	$hOut = fopen($sOutFile , 'w');
-
-	foreach($arrRet as $sGroup => $arrLn) {
-		if ($arrLn[1] == 'Success' && trim($arrLn[5]) != '' && trim($arrLn[6]) != '' ) {
-//			fwrite($hOut , implode("\t" , $arrLn) . "\n"); //only write back good ones.
-		} else {
-			echo("To be retried: $sGroup \n");
-		}
-	}
-
-//	fclose($hOut);
-
-	return $arrRet;
-}
-
-function fnLoadGeneSymbolMap($sOrthologList) {
-
-	if (!file_exists($sOrthologList) ) {
-		die("Gene symbol definition not found $sOrthologList\n");
-	}
-
-	$hOrthologList = fopen($sOrthologList , "r");
-	$arrOrthologMeta = array();
-
-
-	$nLn = -1;
-	echo("Parsing ortholog definitions...\n");
-	while( ($sLn=fgets($hOrthologList))!==false ) {
-		$sLn = trim($sLn);
-		if ($sLn == "") {
-			continue;
-		}
-		$nLn++;
-		if ($nLn==0) {
-			continue; // skip header
-		}
-	
-		$arrFields = explode("\t", $sLn);
-		$arrOrthologMeta[$arrFields[0]] = array_slice($arrFields , 1, 2);
-	}
-
-	echo("Loaded ". count($arrOrthologMeta) ." ortholog definitions\n" );
-
-	return $arrOrthologMeta;
-}
-
-function str_lreplace($search, $replace, $subject)
-{
-    $pos = strrpos($subject, $search);
-
-    if($pos !== false)
-    {
-        $subject = substr_replace($subject, $replace, $pos, strlen($search));
-    }
-
-    return $subject;
-}
-
+// utility to write phylip files
 function fnWritePhylip($arrSeqs, $h) {
 	global $arrTaxaList;
 	$arrOutSeq = array();
@@ -299,7 +193,6 @@ function fnWritePhylip($arrSeqs, $h) {
 	$nTotalAlnLen = 0;
 	foreach($arrSeqs as $sGeneName => $arrGeneSeqs) {
 		list($sFirstKey) = array_keys($arrGeneSeqs);
-		
 		$nAlnLen = strlen($arrGeneSeqs[$sFirstKey]);
 
 		foreach($arrTaxaList as $sTaxon => $n) {
@@ -307,10 +200,8 @@ function fnWritePhylip($arrSeqs, $h) {
 				$arrOutSeq[$sTaxon] .= str_repeat('N', $nAlnLen);
 				continue;
 			}
-
 			$arrOutSeq[$sTaxon] .=  $arrGeneSeqs[$sTaxon];
 		}
-
 		$nTotalAlnLen += $nAlnLen;
 	}
 
@@ -319,6 +210,4 @@ function fnWritePhylip($arrSeqs, $h) {
 		fwrite($h , "$sTaxon\t\t\t\t\t$sSeq\n");
 	}
 }
-
-
 ?>

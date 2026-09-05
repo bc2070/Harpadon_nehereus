@@ -6,18 +6,20 @@
 #SBATCH -o aps-%j.out
 #SBATCH -e aps-%j.err
 
+# define input and analysis parameters
 VCF="all.samples.vcf.gz"
 CLEAN_VCF="all.samples.cleaned.vcf.gz"
 PREFIX="LTY_PCA_v2"
 THREADS=$SLURM_CPUS_PER_TASK
 MEM_LIMIT=72000 
 
-
+# filter vcf for high quality bi-allelic snps
 bcftools annotate -x QUAL "$VCF" --threads "$THREADS" -Ou | \
 bcftools view -v snps -m2 -M2 --threads "$THREADS" -Oz -o "$CLEAN_VCF"
 
 SAMPLE_COUNT=$(bcftools query -l "$CLEAN_VCF" | wc -l)
 
+# convert filtered vcf to plink pgen format with quality filtering
 plink2 --vcf "$CLEAN_VCF" \
        --double-id \
        --set-all-var-ids @:# \
@@ -31,6 +33,7 @@ plink2 --vcf "$CLEAN_VCF" \
        --memory "$MEM_LIMIT" \
        --out "${PREFIX}_raw"
 
+# perform linkage disequilibrium pruning
 plink2 --pfile "${PREFIX}_raw" \
        --indep-pairwise 50 5 0.2 \
        --allow-extra-chr \
@@ -38,6 +41,7 @@ plink2 --pfile "${PREFIX}_raw" \
        --memory "$MEM_LIMIT" \
        --out "${PREFIX}_ld_prune"
 
+# calculate principal components using pruned variants
 plink2 --pfile "${PREFIX}_raw" \
        --extract "${PREFIX}_ld_prune.prune.in" \
        --pca 20 \
@@ -45,4 +49,3 @@ plink2 --pfile "${PREFIX}_raw" \
        --threads "$THREADS" \
        --memory "$MEM_LIMIT" \
        --out "${PREFIX}_final"
-

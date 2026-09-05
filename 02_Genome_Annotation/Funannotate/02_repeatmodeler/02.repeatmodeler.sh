@@ -8,9 +8,9 @@ SP=pachycara
 REPMODEL="singularity run docker://dfam/tetools:latest " #command of repeatmodeler
 THREADS=40
 
-#ln -sf $ASSEMBLY scf.fa
-
+# build repeatmodeler database
 $REPMODEL BuildDatabase -name $SP -engine ncbi $ASSEMBLY
 
+# run repeatmodeler to identify repeat families
 $REPMODEL RepeatModeler -LTRStruct -engine ncbi -threads $THREADS -database $SP
 
